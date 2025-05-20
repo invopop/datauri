@@ -9,7 +9,7 @@ import (
 	"os"
 	"path"
 
-	"github.com/ananthb/dataurl"
+	"github.com/invopop/dataurl"
 )
 
 var (

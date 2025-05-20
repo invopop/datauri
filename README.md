@@ -1,10 +1,10 @@
 # Dataurl
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/ananthb/dataurl.svg)](https://pkg.go.dev/github.com/ananthb/dataurl)
+[![Go Reference](https://pkg.go.dev/badge/github.com/invopop/dataurl.svg)](https://pkg.go.dev/github.com/invopop/dataurl)
 
 Data URL Schemes for Go
 
-[![CI 🏗](https://github.com/ananthb/dataurl/actions/workflows/ci.yml/badge.svg)](https://github.com/ananthb/dataurl/actions/workflows/ci.yml)
+[![CI 🏗](https://github.com/invopop/dataurl/actions/workflows/ci.yml/badge.svg)](https://github.com/invopop/dataurl/actions/workflows/ci.yml)
 
 This package parses and generates Data URL Schemes for the Go language,
 according to [RFC 2397](http://tools.ietf.org/html/rfc2397).
@@ -20,7 +20,7 @@ Install it with `go install github.com/ananthb/dataurl/cmd/dataurl@latest`.
 
 ## [LICENSE](LICENSE)
 
-Forked from [vincent-petithory/dataurl](https://github.com/vincent-petithory/dataurl)
+Forked from [RealImage/dataurl](https://github.com/RealImage/dataurl), which in turn is forked from [vincent-petithory/dataurl](https://github.com/vincent-petithory/dataurl)
 with contributions from [MagicalTux/dataurl](https://github.com/MagicalTux/dataurl/tree/fix-issue-5).
 
 Dataurl is available under the terms of the MIT license.
