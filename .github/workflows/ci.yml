@@ -16,9 +16,10 @@ jobs:
     name: Lint & test code.
     strategy:
       matrix:
-        os: ['ubuntu-latest', 'macos-latest', 'windows-latest']
-        go: ['stable', 'oldstable']
+        os: ["ubuntu-latest", "macos-latest", "windows-latest"]
+        go: ["stable", "oldstable"]
     runs-on: ${{ matrix.os }}
+
     steps:
       - uses: actions/checkout@v4
 

@@ -68,7 +68,7 @@ func main() {
 			log.Fatal(err)
 		} else {
 			in = f
-			defer f.Close()
+			defer f.Close() //nolint:errcheck
 		}
 		ext := path.Ext(flag.Arg(0))
 		detectedMimetype = mime.TypeByExtension(ext)

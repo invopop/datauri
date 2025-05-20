@@ -132,16 +132,17 @@ func (du *DataURL) WriteTo(w io.Writer) (n int64, err error) {
 	ni, _ = fmt.Fprint(w, ",")
 	n += int64(ni)
 
-	if du.Encoding == EncodingBase64 {
+	switch du.Encoding {
+	case EncodingBase64:
 		encoder := base64.NewEncoder(base64.StdEncoding, w)
 		if _, err = encoder.Write(du.Data); err != nil {
 			return
 		}
-		encoder.Close()
-	} else if du.Encoding == EncodingASCII {
+		encoder.Close() //nolint:errcheck
+	case EncodingASCII:
 		ni, _ = fmt.Fprint(w, Escape(du.Data))
 		n += int64(ni)
-	} else {
+	default:
 		err = fmt.Errorf("dataurl: invalid encoding %s", du.Encoding)
 		return
 	}
@@ -200,12 +201,12 @@ func (p *parser) parse() error {
 		case itemError:
 			return errors.New(item.String())
 		case itemMediaType:
-			p.du.MediaType.Type = item.val
+			p.du.Type = item.val
 			// Should we clear the default
 			// "charset" parameter at this point?
-			delete(p.du.MediaType.Params, "charset")
+			delete(p.du.Params, "charset")
 		case itemMediaSubType:
-			p.du.MediaType.Subtype = item.val
+			p.du.Subtype = item.val
 		case itemParamAttr:
 			p.currentAttr = item.val
 		case itemLeftStringQuote:
@@ -226,7 +227,7 @@ func (p *parser) parse() error {
 				}
 				val = us
 			}
-			p.du.MediaType.Params[p.currentAttr] = val
+			p.du.Params[p.currentAttr] = val
 		case itemBase64Enc:
 			p.du.Encoding = EncodingBase64
 			p.encodedDataReaderFn = base64DataReader
@@ -283,7 +284,7 @@ func EncodeBytes(data []byte) string {
 	mt := http.DetectContentType(data)
 	// http.DetectContentType may add spurious spaces between ; and a parameter.
 	// The canonical way is to not have them.
-	cleanedMt := strings.Replace(mt, "; ", ";", -1)
+	cleanedMt := strings.ReplaceAll(mt, "; ", ";")
 
 	return New(data, cleanedMt).String()
 }

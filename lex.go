@@ -107,7 +107,7 @@ func isURLCharRune(r rune) bool {
 	// This is okay, since url unescaping will validate
 	// that later in the parser.
 	return r <= unicode.MaxASCII &&
-		!(r >= 0x00 && r <= 0x1F) && r != 0x7F && /* control */
+		(r < 0x00 || r > 0x1F) && r != 0x7F && /* control */
 		// delims
 		r != ' ' &&
 		r != '<' &&
@@ -307,14 +307,14 @@ func lexMediaSubType(l *lexer) stateFn {
 }
 
 func lexAfterMediaSubType(l *lexer) stateFn {
-	switch r := l.next(); {
-	case r == paramSemicolon:
+	switch r := l.next(); r {
+	case paramSemicolon:
 		l.backup()
 		return lexParamSemicolon
-	case r == dataComma:
+	case dataComma:
 		l.backup()
 		return lexDataComma
-	case r == eof:
+	case eof:
 		return l.errorf("missing comma before data")
 	default:
 		return l.errorf("expected semicolon or comma")
@@ -457,14 +457,14 @@ func lexParamVal(l *lexer) stateFn {
 }
 
 func lexAfterParamVal(l *lexer) stateFn {
-	switch r := l.next(); {
-	case r == paramSemicolon:
+	switch r := l.next(); r {
+	case paramSemicolon:
 		l.backup()
 		return lexParamSemicolon
-	case r == dataComma:
+	case dataComma:
 		l.backup()
 		return lexDataComma
-	case r == eof:
+	case eof:
 		return l.errorf("missing comma before data")
 	default:
 		return l.errorf("expected semicolon or comma")

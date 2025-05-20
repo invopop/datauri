@@ -450,7 +450,7 @@ func TestNew(t *testing.T) {
 	}
 }
 
-var golangFavicon = strings.Replace(
+var golangFavicon = strings.ReplaceAll(
 	`AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAAAAAAAAAAAAAAAAAAA
 AAAAAAD///8AVE44//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb/
 /uF2/1ROOP////8A////AFROOP/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+
@@ -474,7 +474,6 @@ Tv/Ip07//uF2//7hdv/+4Xb//uF2/8zBlv/Kv4//pZJU/3tzTv9UTjj/19nd/////wD///8A4eLl
 AAAAAAAAAAAAAA==`,
 	"\n",
 	"",
-	-1,
 )
 
 func TestEncodeBytes(t *testing.T) {
@@ -562,7 +561,7 @@ func ExampleDecodeString() {
 		fmt.Println(err)
 		return
 	}
-	fmt.Printf("%s, %s", dataURL.MediaType.ContentType(), string(dataURL.Data))
+	fmt.Printf("%s, %s", dataURL.ContentType(), string(dataURL.Data))
 	// Output: text/plain, heya
 }
 
@@ -583,7 +582,7 @@ func ExampleDecode() {
 	h := func(_ http.ResponseWriter, r *http.Request) {
 		var err error
 		dataURL, err = Decode(r.Body)
-		defer r.Body.Close()
+		defer r.Body.Close() //nolint:errcheck
 		if err != nil {
 			fmt.Println(err)
 		}
