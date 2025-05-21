@@ -1,4 +1,4 @@
-package dataurl
+package datauri
 
 import (
 	"bytes"
@@ -12,14 +12,14 @@ import (
 	"testing"
 )
 
-type dataURLTest struct {
-	InputRawDataURL string
+type dataURITest struct {
+	InputRawDataURI string
 	ExpectedItems   []item
-	ExpectedDataURL DataURL
+	ExpectedDataURI DataURI
 }
 
-func genTestTable() []dataURLTest {
-	return []dataURLTest{
+func genTestTable() []dataURITest {
+	return []dataURITest{
 		{
 			`data:;base64,aGV5YQ==`,
 			[]item{
@@ -30,7 +30,7 @@ func genTestTable() []dataURLTest {
 				{itemData, "aGV5YQ=="},
 				{itemEOF, ""},
 			},
-			DataURL{
+			DataURI{
 				defaultMediaType(),
 				EncodingBase64,
 				[]byte("heya"),
@@ -49,7 +49,7 @@ func genTestTable() []dataURLTest {
 				{itemData, "aGV5YQ=="},
 				{itemEOF, ""},
 			},
-			DataURL{
+			DataURI{
 				MediaType{
 					"text",
 					"plain",
@@ -76,7 +76,7 @@ func genTestTable() []dataURLTest {
 				{itemData, "aGV5YQ=="},
 				{itemEOF, ""},
 			},
-			DataURL{
+			DataURI{
 				MediaType{
 					"text",
 					"plain",
@@ -109,7 +109,7 @@ func genTestTable() []dataURLTest {
 				{itemData, "aGV5YQ=="},
 				{itemEOF, ""},
 			},
-			DataURL{
+			DataURI{
 				MediaType{
 					"text",
 					"plain",
@@ -149,7 +149,7 @@ func genTestTable() []dataURLTest {
 				{itemData, "eyJtc2ciOiAiaGV5YSJ9"},
 				{itemEOF, ""},
 			},
-			DataURL{
+			DataURI{
 				MediaType{
 					"application",
 					"json",
@@ -169,7 +169,7 @@ func genTestTable() []dataURLTest {
 				{itemDataPrefix, dataPrefix},
 				{itemError, "invalid character for media type"},
 			},
-			DataURL{},
+			DataURI{},
 		},
 		{
 			`data:,`,
@@ -178,7 +178,7 @@ func genTestTable() []dataURLTest {
 				{itemDataComma, ","},
 				{itemEOF, ""},
 			},
-			DataURL{
+			DataURI{
 				defaultMediaType(),
 				EncodingASCII,
 				[]byte(""),
@@ -192,7 +192,7 @@ func genTestTable() []dataURLTest {
 				{itemData, "A%20brief%20note"},
 				{itemEOF, ""},
 			},
-			DataURL{
+			DataURI{
 				defaultMediaType(),
 				EncodingASCII,
 				[]byte("A brief note"),
@@ -211,7 +211,7 @@ func genTestTable() []dataURLTest {
 				{itemData, "cGllLXN0b2NrX1RoaXJ0eQ=="},
 				{itemEOF, ""},
 			},
-			DataURL{
+			DataURI{
 				MediaType{
 					"image",
 					"svg+xml-im.a.fake",
@@ -239,7 +239,7 @@ func expectItems(expected, actual []item) bool {
 	return true
 }
 
-func equal(du1, du2 *DataURL) (bool, error) {
+func equal(du1, du2 *DataURI) (bool, error) {
 	if !reflect.DeepEqual(du1.MediaType, du2.MediaType) {
 		return false, nil
 	}
@@ -257,9 +257,9 @@ func equal(du1, du2 *DataURL) (bool, error) {
 	return true, nil
 }
 
-func TestLexDataURLs(t *testing.T) {
+func TestLexDataURIs(t *testing.T) {
 	for _, test := range genTestTable() {
-		l := lex(test.InputRawDataURL)
+		l := lex(test.InputRawDataURI)
 		var items []item
 		for item := range l.items {
 			items = append(items, item)
@@ -270,7 +270,7 @@ func TestLexDataURLs(t *testing.T) {
 	}
 }
 
-func testDataURLs(t *testing.T, factory func(string) (*DataURL, error)) {
+func testDataURIs(t *testing.T, factory func(string) (*DataURI, error)) {
 	for _, test := range genTestTable() {
 		var expectedItemError string
 		for _, item := range test.ExpectedItems {
@@ -279,7 +279,7 @@ func testDataURLs(t *testing.T, factory func(string) (*DataURL, error)) {
 				break
 			}
 		}
-		dataURL, err := factory(test.InputRawDataURL)
+		dataURI, err := factory(test.InputRawDataURI)
 		if expectedItemError == "" && err != nil {
 			t.Error(err)
 			continue
@@ -293,29 +293,29 @@ func testDataURLs(t *testing.T, factory func(string) (*DataURL, error)) {
 			continue
 		}
 
-		if ok, err := equal(dataURL, &test.ExpectedDataURL); err != nil {
+		if ok, err := equal(dataURI, &test.ExpectedDataURI); err != nil {
 			t.Error(err)
 		} else if !ok {
-			t.Errorf("Expected %v, got %v", test.ExpectedDataURL, *dataURL)
+			t.Errorf("Expected %v, got %v", test.ExpectedDataURI, *dataURI)
 		}
 	}
 }
 
-func TestDataURLsWithDecode(t *testing.T) {
-	testDataURLs(t, func(s string) (*DataURL, error) {
+func TestDataURIsWithDecode(t *testing.T) {
+	testDataURIs(t, func(s string) (*DataURI, error) {
 		return Decode(strings.NewReader(s))
 	})
 }
 
-func TestDataURLsWithDecodeString(t *testing.T) {
-	testDataURLs(t, func(s string) (*DataURL, error) {
+func TestDataURIsWithDecodeString(t *testing.T) {
+	testDataURIs(t, func(s string) (*DataURI, error) {
 		return DecodeString(s)
 	})
 }
 
-func TestDataURLsWithUnmarshalText(t *testing.T) {
-	testDataURLs(t, func(s string) (*DataURL, error) {
-		d := &DataURL{}
+func TestDataURIsWithUnmarshalText(t *testing.T) {
+	testDataURIs(t, func(s string) (*DataURI, error) {
+		d := &DataURI{}
 		err := d.UnmarshalText([]byte(s))
 		return d, err
 	})
@@ -333,19 +333,19 @@ func TestRoundTrip(t *testing.T) {
 		{`data:text/plain;charset=utf-8;foo=bar,A%20brief%20note`, true},
 	}
 	for _, test := range tests {
-		dataURL, err := DecodeString(test.s)
+		dataURI, err := DecodeString(test.s)
 		if err != nil {
 			t.Error(err)
 			continue
 		}
-		dus := dataURL.String()
+		dus := dataURI.String()
 		if test.roundTripOk && dus != test.s {
 			t.Errorf("Expected %s, got %s", test.s, dus)
 		} else if !test.roundTripOk && dus == test.s {
 			t.Errorf("Found %s, expected something else", test.s)
 		}
 
-		txt, err := dataURL.MarshalText()
+		txt, err := dataURI.MarshalText()
 		if err != nil {
 			t.Error(err)
 			continue
@@ -364,14 +364,14 @@ func TestNew(t *testing.T) {
 		MediaType       string
 		ParamPairs      []string
 		WillPanic       bool
-		ExpectedDataURL *DataURL
+		ExpectedDataURI *DataURI
 	}{
 		{
 			[]byte(`{"msg": "heya"}`),
 			"application/json",
 			[]string{},
 			false,
-			&DataURL{
+			&DataURI{
 				MediaType{
 					"application",
 					"json",
@@ -400,7 +400,7 @@ func TestNew(t *testing.T) {
 			"text/plain",
 			[]string{"charset", "utf-8"},
 			false,
-			&DataURL{
+			&DataURI{
 				MediaType{
 					"text",
 					"plain",
@@ -421,7 +421,7 @@ func TestNew(t *testing.T) {
 		},
 	}
 	for _, test := range tests {
-		var dataURL *DataURL
+		var dataURI *DataURI
 		func() {
 			defer func() {
 				if test.WillPanic {
@@ -434,17 +434,17 @@ func TestNew(t *testing.T) {
 					}
 				}
 			}()
-			dataURL = New(test.Data, test.MediaType, test.ParamPairs...)
+			dataURI = New(test.Data, test.MediaType, test.ParamPairs...)
 		}()
 		if test.WillPanic {
-			if dataURL != nil {
-				t.Error("Expected nil DataURL")
+			if dataURI != nil {
+				t.Error("Expected nil DataURI")
 			}
 		} else {
-			if ok, err := equal(dataURL, test.ExpectedDataURL); err != nil {
+			if ok, err := equal(dataURI, test.ExpectedDataURI); err != nil {
 				t.Error(err)
 			} else if !ok {
-				t.Errorf("Expected %v, got %v", test.ExpectedDataURL, *dataURL)
+				t.Errorf("Expected %v, got %v", test.ExpectedDataURI, *dataURI)
 			}
 		}
 	}
@@ -512,7 +512,7 @@ func TestEncodeBytes(t *testing.T) {
 func BenchmarkLex(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		for _, test := range genTestTable() {
-			l := lex(test.InputRawDataURL)
+			l := lex(test.InputRawDataURI)
 			for range l.items {
 			}
 		}
@@ -535,10 +535,10 @@ func TestRegexp(t *testing.T) {
 			}
 		}
 		// just test it matches, do not parse
-		if re.MatchString(test.InputRawDataURL) && !shouldMatch {
-			t.Error("doesn't match", test.InputRawDataURL)
-		} else if !re.MatchString(test.InputRawDataURL) && shouldMatch {
-			t.Error("match", test.InputRawDataURL)
+		if re.MatchString(test.InputRawDataURI) && !shouldMatch {
+			t.Error("doesn't match", test.InputRawDataURI)
+		} else if !re.MatchString(test.InputRawDataURI) && shouldMatch {
+			t.Error("match", test.InputRawDataURI)
 		}
 	}
 }
@@ -550,18 +550,18 @@ func BenchmarkRegexp(b *testing.B) {
 	}
 	for i := 0; i < b.N; i++ {
 		for _, test := range genTestTable() {
-			_ = re.FindStringSubmatch(test.InputRawDataURL)
+			_ = re.FindStringSubmatch(test.InputRawDataURI)
 		}
 	}
 }
 
 func ExampleDecodeString() {
-	dataURL, err := DecodeString(`data:text/plain;charset=utf-8;base64,aGV5YQ==`)
+	dataURI, err := DecodeString(`data:text/plain;charset=utf-8;base64,aGV5YQ==`)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	fmt.Printf("%s, %s", dataURL.ContentType(), string(dataURL.Data))
+	fmt.Printf("%s, %s", dataURI.ContentType(), string(dataURI.Data))
 	// Output: text/plain, heya
 }
 
@@ -578,10 +578,10 @@ func ExampleDecode() {
 		return
 	}
 
-	var dataURL *DataURL
+	var dataURI *DataURI
 	h := func(_ http.ResponseWriter, r *http.Request) {
 		var err error
-		dataURL, err = Decode(r.Body)
+		dataURI, err = Decode(r.Body)
 		defer r.Body.Close() //nolint:errcheck
 		if err != nil {
 			fmt.Println(err)
@@ -589,6 +589,6 @@ func ExampleDecode() {
 	}
 	w := httptest.NewRecorder()
 	h(w, r)
-	fmt.Printf("%s: %s", dataURL.Params["name"], dataURL.ContentType())
+	fmt.Printf("%s: %s", dataURI.Params["name"], dataURI.ContentType())
 	// Output: golang favicon: image/vnd.microsoft.icon
 }

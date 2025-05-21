@@ -1,4 +1,4 @@
-package dataurl
+package datauri
 
 import (
 	"bytes"
@@ -13,9 +13,9 @@ import (
 )
 
 const (
-	// EncodingBase64 is base64 encoding for the data url
+	// EncodingBase64 is base64 encoding for the data uri
 	EncodingBase64 = "base64"
-	// EncodingASCII is ascii encoding for the data url
+	// EncodingASCII is ascii encoding for the data uri
 	EncodingASCII = "ascii"
 )
 
@@ -35,7 +35,7 @@ type MediaType struct {
 	Params  map[string]string
 }
 
-// ContentType returns the content type of the dataurl's data, in the form type/subtype.
+// ContentType returns the content type of the datauri's data, in the form type/subtype.
 func (mt *MediaType) ContentType() string {
 	return fmt.Sprintf("%s/%s", mt.Type, mt.Subtype)
 }
@@ -61,28 +61,28 @@ func (mt *MediaType) String() string {
 	return mt.ContentType() + (&buf).String()
 }
 
-// DataURL is the combination of a MediaType describing the type of its Data.
-type DataURL struct {
+// DataURI is the combination of a MediaType describing the type of its Data.
+type DataURI struct {
 	MediaType
 	Encoding string
 	Data     []byte
 }
 
-// New returns a new DataURL initialized with data and
+// New returns a new DataURI initialized with data and
 // a MediaType parsed from mediatype and paramPairs.
 // mediatype must be of the form "type/subtype" or it will panic.
 // paramPairs must have an even number of elements or it will panic.
-// For more complex DataURL, initialize a DataURL struct.
-// The DataURL is initialized with base64 encoding.
-func New(data []byte, mediatype string, paramPairs ...string) *DataURL {
+// For more complex DataURI, initialize a DataURI struct.
+// The DataURI is initialized with base64 encoding.
+func New(data []byte, mediatype string, paramPairs ...string) *DataURI {
 	parts := strings.Split(mediatype, "/")
 	if len(parts) != 2 {
-		panic("dataurl: invalid mediatype")
+		panic("datauri: invalid mediatype")
 	}
 
 	nParams := len(paramPairs)
 	if nParams%2 != 0 {
-		panic("dataurl: requires an even number of param pairs")
+		panic("datauri: requires an even number of param pairs")
 	}
 	params := make(map[string]string)
 	for i := 0; i < nParams; i += 2 {
@@ -94,7 +94,7 @@ func New(data []byte, mediatype string, paramPairs ...string) *DataURL {
 		parts[1],
 		params,
 	}
-	return &DataURL{
+	return &DataURI{
 		MediaType: mt,
 		Encoding:  EncodingBase64,
 		Data:      data,
@@ -104,11 +104,11 @@ func New(data []byte, mediatype string, paramPairs ...string) *DataURL {
 // String implements the Stringer interface.
 //
 // Note: it doesn't guarantee the returned string is equal to
-// the initial source string that was used to create this DataURL.
+// the initial source string that was used to create this DataURI.
 // The reasons for that are:
 //   - Insertion of default values for MediaType that were maybe not in the initial string,
-//   - Various ways to encode the MediaType parameters (quoted string or url encoded string, the latter is used),
-func (du *DataURL) String() string {
+//   - Various ways to encode the MediaType parameters (quoted string or uri encoded string, the latter is used),
+func (du *DataURI) String() string {
 	var buf bytes.Buffer
 	_, _ = du.WriteTo(&buf)
 	return (&buf).String()
@@ -116,7 +116,7 @@ func (du *DataURL) String() string {
 
 // WriteTo implements the WriterTo interface.
 // See the note about String().
-func (du *DataURL) WriteTo(w io.Writer) (n int64, err error) {
+func (du *DataURI) WriteTo(w io.Writer) (n int64, err error) {
 	var ni int
 	ni, _ = fmt.Fprint(w, "data:")
 	n += int64(ni)
@@ -143,15 +143,15 @@ func (du *DataURL) WriteTo(w io.Writer) (n int64, err error) {
 		ni, _ = fmt.Fprint(w, Escape(du.Data))
 		n += int64(ni)
 	default:
-		err = fmt.Errorf("dataurl: invalid encoding %s", du.Encoding)
+		err = fmt.Errorf("datauri: invalid encoding %s", du.Encoding)
 		return
 	}
 
 	return
 }
 
-// UnmarshalText decodes a Data URL string and sets it to *du
-func (du *DataURL) UnmarshalText(text []byte) error {
+// UnmarshalText decodes a Data URI string and sets it to *du
+func (du *DataURI) UnmarshalText(text []byte) error {
 	decoded, err := DecodeString(string(text))
 	if err != nil {
 		return err
@@ -160,8 +160,8 @@ func (du *DataURL) UnmarshalText(text []byte) error {
 	return nil
 }
 
-// MarshalText writes du as a Data URL
-func (du *DataURL) MarshalText() ([]byte, error) {
+// MarshalText writes du as a Data URI
+func (du *DataURI) MarshalText() ([]byte, error) {
 	buf := bytes.NewBuffer(nil)
 	if _, err := du.WriteTo(buf); err != nil {
 		return nil, err
@@ -188,7 +188,7 @@ var base64DataReader encodedDataReader = func(s string) ([]byte, error) {
 }
 
 type parser struct {
-	du                  *DataURL
+	du                  *DataURI
 	l                   *lexer
 	currentAttr         string
 	unquoteParamVal     bool
@@ -251,9 +251,9 @@ func (p *parser) parse() error {
 	panic("EOF not found")
 }
 
-// DecodeString decodes a Data URL scheme string.
-func DecodeString(s string) (*DataURL, error) {
-	du := &DataURL{
+// DecodeString decodes a Data URI scheme string.
+func DecodeString(s string) (*DataURI, error) {
+	du := &DataURI{
 		MediaType: defaultMediaType(),
 		Encoding:  EncodingASCII,
 	}
@@ -268,8 +268,8 @@ func DecodeString(s string) (*DataURL, error) {
 	return du, nil
 }
 
-// Decode decodes a Data URL scheme from a io.Reader.
-func Decode(r io.Reader) (*DataURL, error) {
+// Decode decodes a Data URI scheme from a io.Reader.
+func Decode(r io.Reader) (*DataURI, error) {
 	data, err := io.ReadAll(r)
 	if err != nil {
 		return nil, err
@@ -277,7 +277,7 @@ func Decode(r io.Reader) (*DataURL, error) {
 	return DecodeString(string(data))
 }
 
-// EncodeBytes encodes the data bytes into a Data URL string, using base 64 encoding.
+// EncodeBytes encodes the data bytes into a Data URI string, using base 64 encoding.
 //
 // The media type of data is detected using http.DetectContentType.
 func EncodeBytes(data []byte) string {

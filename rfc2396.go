@@ -1,4 +1,4 @@
-package dataurl
+package datauri
 
 import (
 	"net/url"

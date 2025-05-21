@@ -9,7 +9,7 @@ import (
 	"os"
 	"path"
 
-	"github.com/invopop/dataurl"
+	"github.com/invopop/datauri"
 )
 
 var (
@@ -33,12 +33,12 @@ func init() {
 
 	flag.Usage = func() {
 		fmt.Fprint(os.Stderr,
-			`dataurl - Encode or decode dataurl data and print to standard output
+			`datauri - Encode or decode datauri data and print to standard output
 
-Usage: dataurl [OPTION]... [FILE]
+Usage: datauri [OPTION]... [FILE]
 
-  dataurl encodes or decodes FILE or standard input if FILE is - or omitted, and prints to standard output.
-  Unless -mimetype is used, when FILE is specified, dataurl will attempt to detect its mimetype using Go's mime.TypeByExtension (http://golang.org/pkg/mime/#TypeByExtension). If this fails or data is read from STDIN, the mimetype will default to application/octet-stream.
+  datauri encodes or decodes FILE or standard input if FILE is - or omitted, and prints to standard output.
+  Unless -mimetype is used, when FILE is specified, datauri will attempt to detect its mimetype using Go's mime.TypeByExtension (http://golang.org/pkg/mime/#TypeByExtension). If this fails or data is read from STDIN, the mimetype will default to application/octet-stream.
 
 Options:
 `)
@@ -53,7 +53,7 @@ func main() {
 	var (
 		in               io.Reader
 		out              = os.Stdout
-		encoding         = dataurl.EncodingBase64
+		encoding         = datauri.EncodingBase64
 		detectedMimetype string
 	)
 	switch n := flag.NArg(); n {
@@ -87,7 +87,7 @@ func main() {
 		}
 	} else {
 		if asciiEncoding {
-			encoding = dataurl.EncodingASCII
+			encoding = datauri.EncodingASCII
 		}
 		if err := encode(in, out, encoding, mimetype); err != nil {
 			log.Fatal(err)
@@ -102,7 +102,7 @@ func decode(in io.Reader, out io.Writer) (err error) {
 		}
 	}()
 
-	du, err := dataurl.Decode(in)
+	du, err := datauri.Decode(in)
 	if err != nil {
 		return
 	}
@@ -127,7 +127,7 @@ func encode(in io.Reader, out io.Writer, encoding string, mediatype string) (err
 		return
 	}
 
-	du := dataurl.New(b, mediatype)
+	du := datauri.New(b, mediatype)
 	du.Encoding = encoding
 
 	_, err = du.WriteTo(out)

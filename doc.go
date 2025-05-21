@@ -1,7 +1,7 @@
-// Package dataurl parses Data URL Schemes
+// Package datauri parses Data URI Schemes
 // according to RFC 2397 (http://tools.ietf.org/html/rfc2397).
 //
-// Data URLs are small chunks of data commonly used in browsers to display inline data,
+// Data URIs are small chunks of data commonly used in browsers to display inline data,
 // typically like small images, or when you use the FileReader API of the browser.
 //
 // A dataurl looks like:
@@ -19,6 +19,6 @@
 //	//8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 //	AAAAAAAAAAAAAA==
 //
-// Common functions are Decode and DecodeString to obtain a DataURL,
-// and DataURL.String() and DataURL.WriteTo to generate a Data URL string.
-package dataurl
+// Common functions are Decode and DecodeString to obtain a DataURI,
+// and DataURI.String() and DataURI.WriteTo to generate a Data URI string.
+package datauri
